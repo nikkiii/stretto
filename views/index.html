@@ -23,6 +23,11 @@
     <div class='current_time'></div>
     <div class='duration'></div>
     <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
+    <div id="conversionProgress" class="progress hidden" style="margin-bottom: 0;">
+      <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+        Converting...
+      </div>
+    </div>
     <div id="current_info">&nbsp;</div>
     <div class="controls">
       <i id="repeat" class="fa fa-retweet fa-3x blue"></i>
@@ -296,6 +301,7 @@ var this_ip = "{{ip}}";
 var country_code = "{{country_code}}";
 var on_mobile = false;
 </script>
+<script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 {% endblock %}
 {% block scripts %}
 {% endblock %}

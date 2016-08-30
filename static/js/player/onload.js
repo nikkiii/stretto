@@ -1,167 +1,167 @@
-$(document).ready(function() {
-  player.setScubElem($('#scrub_bar'));
+$(document).ready(function () {
+    player.setScubElem($('#scrub_bar'));
 
-  // variable for keeping track of seeking
-  var is_seeking = false;
-  /*
-   * use this flag to mark a keydown has happened before a keyup happens
-   * this is to work with a stupid bug in windows that lets the desktop-level
-   * workspace change shortcuts leak keys (like right/left arrow) though to the
-   * application...
-   */
-  var prevNextDown = false;
-  var seek_interval = 0;
-  var HOLD_TIME = 500;
-  $('body').keydown(function(event) {
-    // don't fire the controls if the user is editing an input
-    if (event.target.localName == 'input') {
-      return;
-    }
-
-    if (event.which == 37 || event.which == 39) {
-      prevNextDown = true;
-    }
-
-    switch (event.which){
-      case 191: // '?' key
-      case 83: // 's' key
-        // focus search box
-        $('.search-input').select();
-        return false;
-      case 32: // space key
-        player.togglePlayState();
-        event.preventDefault();
-        break;
-      case 39: // right key
-        // block to only run on first key down
-        if (!seek_interval) {
-          is_seeking = false;
-
-          // call function every HOLD_TIME, if we don't get called, then it wasn't held down
-          seek_interval = setInterval(function() {
-            is_seeking = true;
-            player.PlayMethodAbstracter.setCurrentTime(player.PlayMethodAbstracter.getCurrentTime() + 5);
-          }, HOLD_TIME);
+    // variable for keeping track of seeking
+    var is_seeking = false;
+    /*
+     * use this flag to mark a keydown has happened before a keyup happens
+     * this is to work with a stupid bug in windows that lets the desktop-level
+     * workspace change shortcuts leak keys (like right/left arrow) though to the
+     * application...
+     */
+    var prevNextDown = false;
+    var seek_interval = 0;
+    var HOLD_TIME = 500;
+    $('body').keydown(function (event) {
+        // don't fire the controls if the user is editing an input
+        if (event.target.localName == 'input') {
+            return;
         }
 
-        event.preventDefault();
-        break;
-      case 37: // left key
-        // block to only run on first key down
-        if (!seek_interval) {
-          is_seeking = false;
-
-          // call function every HOLD_TIME, if we don't get called, then it wasn't held down
-          seek_interval = setInterval(function() {
-            is_seeking = true;
-            player.PlayMethodAbstracter.setCurrentTime(player.PlayMethodAbstracter.getCurrentTime() - 5);
-          }, HOLD_TIME);
+        if (event.which == 37 || event.which == 39) {
+            prevNextDown = true;
         }
 
-        event.preventDefault();
-        break;
-      case 38: // up key
-        MusicApp.router.songview.moveSelection('up');
-        event.preventDefault();
-        break;
-      case 40: // down key
-        MusicApp.router.songview.moveSelection('down');
-        event.preventDefault();
-        break;
-      case 13: // enter key
-        // play the last selected item
-        player.playSong(lastSelection);
+        switch (event.which) {
+            case 191: // '?' key
+            case 83: // 's' key
+                // focus search box
+                $('.search-input').select();
+                return false;
+            case 32: // space key
+                player.togglePlayState();
+                event.preventDefault();
+                break;
+            case 39: // right key
+                // block to only run on first key down
+                if (!seek_interval) {
+                    is_seeking = false;
 
-        // add it to the history and reset the history
-        player.play_history.unshift(lastSelection);
-        player.play_history_idx = 0;
-    }
-  });
+                    // call function every HOLD_TIME, if we don't get called, then it wasn't held down
+                    seek_interval = setInterval(function () {
+                        is_seeking = true;
+                        player.PlayMethodAbstracter.setCurrentTime(player.PlayMethodAbstracter.getCurrentTime() + 5);
+                    }, HOLD_TIME);
+                }
 
-  $('body').keyup(function(event) {
-    // don't fire the controls if the user is editing an input
-    if (event.target.localName == 'input') {
-      return;
-    }
+                event.preventDefault();
+                break;
+            case 37: // left key
+                // block to only run on first key down
+                if (!seek_interval) {
+                    is_seeking = false;
 
-    // left or right repectively
-    if (event.which == 37 || event.which == 39) {
-      // clear the seeking interval
-      clearInterval(seek_interval);
-      seek_interval = 0;
+                    // call function every HOLD_TIME, if we don't get called, then it wasn't held down
+                    seek_interval = setInterval(function () {
+                        is_seeking = true;
+                        player.PlayMethodAbstracter.setCurrentTime(player.PlayMethodAbstracter.getCurrentTime() - 5);
+                    }, HOLD_TIME);
+                }
 
-      // decide if we should move to the next/prev track
-      if (prevNextDown) {
-        prevNextDown = false;
+                event.preventDefault();
+                break;
+            case 38: // up key
+                MusicApp.router.songview.moveSelection('up');
+                event.preventDefault();
+                break;
+            case 40: // down key
+                MusicApp.router.songview.moveSelection('down');
+                event.preventDefault();
+                break;
+            case 13: // enter key
+                // play the last selected item
+                player.playSong(lastSelection);
 
-        // don't go next if we are seeking
-        if (!is_seeking) {
-          // based on the keycode, call prev/next on the player
-          event.which == 37 ? player.prevTrack() : player.nextTrack();
+                // add it to the history and reset the history
+                player.play_history.unshift(lastSelection);
+                player.play_history_idx = 0;
         }
-      }
-
-      // prevent the event from propagating
-      event.preventDefault();
-    }
-  });
-
-  // disable the options on scroll
-  $('#content').scroll(hideOptions);
-
-  // add click handler on menu items
-  $('#soundcloud_fetch').click(function() {
-    bootbox.prompt({
-      title: 'Enter the SoundCloud URL',
-      callback: function(result) {
-        if (result !== null) {
-          socket.emit('soundcloud_download', {url: result});
-        }
-      },
     });
-  });
 
-  $('#youtube_fetch').click(function() {
-    bootbox.prompt({
-      title: 'Enter the Youtube URL (also works for playlist downloads)',
-      callback: function(result) {
-        if (result !== null) {
-          socket.emit('youtube_download', {url: result});
+    $('body').keyup(function (event) {
+        // don't fire the controls if the user is editing an input
+        if (event.target.localName == 'input') {
+            return;
         }
-      },
+
+        // left or right repectively
+        if (event.which == 37 || event.which == 39) {
+            // clear the seeking interval
+            clearInterval(seek_interval);
+            seek_interval = 0;
+
+            // decide if we should move to the next/prev track
+            if (prevNextDown) {
+                prevNextDown = false;
+
+                // don't go next if we are seeking
+                if (!is_seeking) {
+                    // based on the keycode, call prev/next on the player
+                    event.which == 37 ? player.prevTrack() : player.nextTrack();
+                }
+            }
+
+            // prevent the event from propagating
+            event.preventDefault();
+        }
     });
-  });
 
-  $('#open_settings').click(function() {
-    showSettings();
-  });
+    // disable the options on scroll
+    $('#content').scroll(hideOptions);
 
-  // ask them if they would like to view the settings on first load
-  if (!music_dir_set) {
-    showSettings('Welcome! Please ensure your music directory is correct.');
-  }
+    // add click handler on menu items
+    $('#soundcloud_fetch').click(function () {
+        bootbox.prompt({
+            title: 'Enter the SoundCloud URL',
+            callback: function (result) {
+                if (result !== null) {
+                    socket.emit('soundcloud_download', {url: result});
+                }
+            },
+        });
+    });
 
-  // scan library handlers
-  $('#soft_scan').click(function() {
-    socket.emit('start_scan');
-  });
+    $('#youtube_fetch').click(function () {
+        bootbox.prompt({
+            title: 'Enter the Youtube URL (also works for playlist downloads)',
+            callback: function (result) {
+                if (result !== null) {
+                    socket.emit('youtube_download', {url: result});
+                }
+            },
+        });
+    });
 
-  $('#hard_scan').click(function() {
-    socket.emit('start_scan_hard');
-  });
+    $('#open_settings').click(function () {
+        showSettings();
+    });
 
-  // sync button handlers
-  $('#load_sync_view').click(function() {
-    MusicApp.router.syncview = new SyncView();
-    MusicApp.contentRegion.show(MusicApp.router.syncview);
-  });
+    // ask them if they would like to view the settings on first load
+    if (!music_dir_set) {
+        showSettings('Welcome! Please ensure your music directory is correct.');
+    }
 
-  // setup messenger
-  Messenger.options = {
-    extraClasses: 'messenger-fixed messenger-on-top',
-    theme: 'air',
-    messageDefaults: {
-      showCloseButton: true,
-    },
-  };
+    // scan library handlers
+    $('#soft_scan').click(function () {
+        socket.emit('start_scan');
+    });
+
+    $('#hard_scan').click(function () {
+        socket.emit('start_scan_hard');
+    });
+
+    // sync button handlers
+    $('#load_sync_view').click(function () {
+        MusicApp.router.syncview = new SyncView();
+        MusicApp.contentRegion.show(MusicApp.router.syncview);
+    });
+
+    // setup messenger
+    Messenger.options = {
+        extraClasses: 'messenger-fixed messenger-on-top',
+        theme: 'air',
+        messageDefaults: {
+            showCloseButton: true,
+        },
+    };
 });
